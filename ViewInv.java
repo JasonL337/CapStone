@@ -4,6 +4,13 @@
  */
 package com.mycompany.inventorytracker;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -28,33 +35,104 @@ public class ViewInv extends Inventory {
         hitRefresh();
         HashMap<String, ArrayList<String[]>> data = new HashMap<>();
         
-        // This would be equivalent to calling into the database and having the SQL return a String or json, but now it is just a String.
-        String myItems = tempItems;
-        String myTypes = tempTypes;
-        String[] lines = myItems.split("\n"); // Split the string into lines
-        String[] types = myTypes.split("\n");
+        String[] dbInfo = getDBInfo();
         
-        
-        
-        // Loops to go through the giant string of item types and data and the items and their data in the inventory class and put it in a Hashmap.
-        for (String type : types) {
-            String itemType = type.substring(type.indexOf(": ") + 2, type.lastIndexOf(": "));
-            
-            
-            data.put(itemType, new ArrayList<>());
-        
-            for (String line : lines) {
-                if (line.contains(itemType)) { // Check if the line contains the search term
-                    String[] dataPoints = line.substring(line.indexOf(": ") + 2).split(": "); // Split the line into data points
-                    data.get(itemType).add(dataPoints);
+        try (Connection conn = DriverManager.getConnection(dbInfo[0], dbInfo[1], dbInfo[2])) {
+            if (conn != null) {
+                // Executes query that returns a string of all the item type names
+                try (Statement statement = conn.createStatement()) {
+                    // Executes query that returns a string of all the item type names
+                    String[] types = returnItemTypes(statement);
+                    for (String type : types) {
+                        ArrayList<String[]> itemData = returnItemData(conn, type);
+                        data.put(type, itemData);
+                    }
+                    // Close the result set and statement
+                    // You can execute SQL queries here
                 }
             }
+        } catch (SQLException ex) {
+            System.out.println("Failed to connect to the database: " + ex.getMessage());
         }
+        
+        /*
+        TESTING TO MAKE SURE THE DATA IS CORRECTLY GATHERED AND ORGANIZED.
+        for (String key: data.keySet()) {
+            System.out.print(key);
+            for (String[] dataSection : data.get(key)) {
+                for (String dataPiece : dataSection) {
+                    System.out.print(dataPiece + " ");
+                }
+                System.out.println();
+            }
+            System.out.println("\n");
+        }
+        */
+        
+        // Loops to go through the giant string of item types and data and the items and their data in the inventory class and put it in a Hashmap.
         return data;
     }
     
-    public void returnItemTypes() {
+    private String[] returnItemTypes(Statement statement) throws SQLException {
+        // Execute a query
+        String sqlCommand = "SELECT COUNT(name) AS count from item_types";
+        String[] names;
+        try (ResultSet length = statement.executeQuery(sqlCommand)) {
+            //resultSet.beforeFirst();
+            //System.out.println(resultSet.getRow());
+            if (length.next())
+                names = new String[length.getInt("count")];
+            else
+                names = new String[0];
+            
+            length.close();
+            
+            
+            ResultSet data = statement.executeQuery("SELECT name from item_types");
+            // Process the result set
+            int index = 0;
+            while (data.next()) {
+                // Retrieve data from the result set
+                String name = data.getString("name");
+                
+                names[index] = name;
+                // Do something with the data, printing the name
+                index++;
+            } 
+            data.close();
+        }
+        return names;
+    }
+    
+    private ArrayList<String[]> returnItemData(Connection conn, String itemType) throws SQLException {
+        // getting all of the data from the items table by creating a prepared statement
+        // and then injecting the itemType to the where clause.
+        ArrayList<String[]> data = new ArrayList<>();
+        PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM items WHERE itemType = ?");
+        ResultSet resultSet;
         
+        pstmt.setString(1, itemType);
+        resultSet = pstmt.executeQuery();
+        
+        ResultSetMetaData metaData = resultSet.getMetaData();
+
+        // Get the number of columns
+        int size = metaData.getColumnCount();
+        
+        while (resultSet.next()) {
+            String[] rowData = new String[size];
+
+            // Retrieve data from each column and store it in the array
+            for (int i = 0; i < size; i++) {
+                Object cell = resultSet.getObject(i + 1);
+                rowData[i] = cell.toString(); // Column indices start from 1
+            }
+            
+            data.add(rowData);
+        }
+        
+        resultSet.close();
+        return data;
     }
     
 }

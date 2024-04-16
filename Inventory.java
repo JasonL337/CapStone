@@ -7,9 +7,13 @@ package com.mycompany.inventorytracker;
 // Class is the parent class to item type and holds methods to print out inventory data.
 
 import java.awt.image.BufferedImage;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 public abstract class Inventory {
+    
     
     // Output is the current String that is printed when a new database item/item type is created and added.
     protected String output = "";
@@ -21,6 +25,21 @@ public abstract class Inventory {
     public static String tempItems = "";
     
     protected String localChanges = "";
+    
+    protected String[] getDBInfo() {
+        Properties props = new Properties();
+        try (FileReader reader = new FileReader(".env")) {
+            props.load(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Retrieve properties
+        String endpoint = props.getProperty("DBURL");
+        String username = props.getProperty("USERNAME");
+        String password = props.getProperty("PASSWORD");
+        return new String[]{endpoint, username, password};
+    } 
     
     public void addChanges(String c)
     {

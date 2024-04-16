@@ -4,28 +4,40 @@
  */
 package com.mycompany.inventorytracker;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
 
 /**
  *
  * @author panoff_894755
  */
 public class Test {
-    public static void main (String[] args) throws ClassNotFoundException {
-        String dbURL = "no data";
-        String username = "no data";
-        String password = "no data";
-
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try (Connection conn = DriverManager.getConnection(dbURL, username, password)) {
-            if (conn != null) {
-                System.out.println("Connected to the database!");
-                // You can execute SQL queries here
-            }
-        } catch (SQLException ex) {
-            System.out.println("Failed to connect to the database: " + ex.getMessage());
+    public static void main (String[] args) throws ClassNotFoundException, IOException {
+        
+        Properties props = new Properties();
+        System.out.println("Current working directory: " + System.getProperty("user.dir"));
+        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\src\\CSProjects\\CapStone\\JDBInfo.env"))) {
+            props.load(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        // Retrieve properties
+        String endpoint = props.getProperty("DBURL");
+        String username = props.getProperty("USERNAME");
+        String password = props.getProperty("PASSWORD");
+        
+        System.out.println("url " + endpoint);
+        System.out.println("username " + username);
+        System.out.println("password " + password);
+        //Class.forName("com.mysql.cj.jdbc.Driver");
+        
     }
 }
