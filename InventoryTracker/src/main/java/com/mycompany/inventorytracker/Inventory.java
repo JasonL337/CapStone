@@ -28,7 +28,7 @@ public abstract class Inventory {
     
     protected String[] getDBInfo() {
         Properties props = new Properties();
-        try (FileReader reader = new FileReader(".env")) {
+        try (FileReader reader = new FileReader("JDBInfo.env")) {
             props.load(reader);
         } catch (IOException e) {
             e.printStackTrace();
