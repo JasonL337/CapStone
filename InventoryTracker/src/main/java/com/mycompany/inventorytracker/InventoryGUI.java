@@ -8,12 +8,17 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.image.BufferedImage;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -33,11 +38,13 @@ public class InventoryGUI extends javax.swing.JFrame {
     /**
      * Creates new form InventoryGUI
      */
-    public InventoryGUI() {
+    public InventoryGUI() throws SQLException {
         initComponents();
         add = new AddToInv();
         view = new ViewInv();
         change = new ChangeInv();
+        
+        //add.addItemType("Misc", "No description declared");
     }
 
     /**
@@ -51,15 +58,8 @@ public class InventoryGUI extends javax.swing.JFrame {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
-        jLabel17 = new javax.swing.JLabel();
         jScrollPane9 = new javax.swing.JScrollPane();
-        jTable9 = new javax.swing.JTable();
-        jLabel18 = new javax.swing.JLabel();
-        jScrollPane10 = new javax.swing.JScrollPane();
-        jTable10 = new javax.swing.JTable();
-        jLabel19 = new javax.swing.JLabel();
-        jScrollPane11 = new javax.swing.JScrollPane();
-        jTable11 = new javax.swing.JTable();
+        jTable_log = new javax.swing.JTable();
         jLabel20 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -69,6 +69,7 @@ public class InventoryGUI extends javax.swing.JFrame {
         jLabel23 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         jButton13 = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jTextField5 = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
@@ -102,6 +103,7 @@ public class InventoryGUI extends javax.swing.JFrame {
         jTable6 = new javax.swing.JTable();
         jButton12 = new javax.swing.JButton();
         jLabel25 = new javax.swing.JLabel();
+        jButton_reset = new javax.swing.JButton();
         jPanel_add = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
@@ -119,53 +121,38 @@ public class InventoryGUI extends javax.swing.JFrame {
         jButtton_AddItem = new javax.swing.JButton();
         jPanel_addPanel = new javax.swing.JPanel();
         jButton_Refresh = new javax.swing.JButton();
+        jPanel_Debug = new javax.swing.JPanel();
+        jButton_testLog = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel17.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel17.setText("Meals");
-
-        jTable9.setModel(new javax.swing.table.DefaultTableModel(
+        jTable_log.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {},
-                {},
-                {}
+
             },
             new String [] {
-
+                "Date", "Log"
             }
-        ));
-        jScrollPane9.setViewportView(jTable9);
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, true
+            };
 
-        jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel18.setText("Drinks");
-
-        jTable10.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
             }
-        ));
-        jScrollPane10.setViewportView(jTable10);
 
-        jLabel19.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel19.setText("Desserts");
-
-        jTable11.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
-        ));
-        jScrollPane11.setViewportView(jTable11);
+        });
+        jScrollPane9.setViewportView(jTable_log);
+        if (jTable_log.getColumnModel().getColumnCount() > 0) {
+            jTable_log.getColumnModel().getColumn(0).setResizable(false);
+        }
 
         jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel20.setText("LOW");
@@ -244,42 +231,39 @@ public class InventoryGUI extends javax.swing.JFrame {
         jButton13.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton13.setText("Export to CSV");
 
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel5.setText("Changes Log");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addGap(15, 15, 15)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(150, 150, 150)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(97, 97, 97))))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(97, 97, 97))
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(93, 93, 93)
-                                .addComponent(jLabel23)
-                                .addGap(44, 44, 44)
-                                .addComponent(jLabel24)))
-                        .addGap(0, 56, Short.MAX_VALUE)))
-                .addGap(23, 23, 23))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jButton13)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(55, 55, 55)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(100, 100, 100)
+                                        .addComponent(jLabel23)
+                                        .addGap(44, 44, 44)
+                                        .addComponent(jLabel24)
+                                        .addGap(0, 7, Short.MAX_VALUE)))))
+                        .addGap(23, 23, 23))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jButton13)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -288,31 +272,24 @@ public class InventoryGUI extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(17, 17, 17)
                         .addComponent(jButton13)
-                        .addGap(4, 4, 4)
-                        .addComponent(jLabel17))
+                        .addGap(47, 47, 47))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel20)))
-                .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
-                        .addComponent(jLabel18)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(32, 32, 32)
-                        .addComponent(jLabel19))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(13, 13, 13)
                         .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel23)
-                            .addComponent(jLabel24))))
-                .addGap(23, 23, 23)
-                .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(111, Short.MAX_VALUE))
+                            .addComponent(jLabel24)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(jLabel5)
+                        .addGap(34, 34, 34)
+                        .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Reports", jPanel3);
@@ -566,6 +543,13 @@ public class InventoryGUI extends javax.swing.JFrame {
 
         jLabel25.setText("*Already started*");
 
+        jButton_reset.setText("Reset Items and types");
+        jButton_reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_resetActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -578,7 +562,7 @@ public class InventoryGUI extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -602,7 +586,10 @@ public class InventoryGUI extends javax.swing.JFrame {
                                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jButton3))
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton_reset)))))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 19, Short.MAX_VALUE)
@@ -623,7 +610,9 @@ public class InventoryGUI extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(16, 16, 16)
-                        .addComponent(jLabel3))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(jButton_reset)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jButton12)
@@ -848,6 +837,32 @@ public class InventoryGUI extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Add", jPanel_add);
 
+        jButton_testLog.setText("Test Log");
+        jButton_testLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_testLogActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel_DebugLayout = new javax.swing.GroupLayout(jPanel_Debug);
+        jPanel_Debug.setLayout(jPanel_DebugLayout);
+        jPanel_DebugLayout.setHorizontalGroup(
+            jPanel_DebugLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel_DebugLayout.createSequentialGroup()
+                .addGap(58, 58, 58)
+                .addComponent(jButton_testLog)
+                .addContainerGap(609, Short.MAX_VALUE))
+        );
+        jPanel_DebugLayout.setVerticalGroup(
+            jPanel_DebugLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel_DebugLayout.createSequentialGroup()
+                .addGap(61, 61, 61)
+                .addComponent(jButton_testLog)
+                .addContainerGap(546, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Debug", jPanel_Debug);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -875,22 +890,70 @@ public class InventoryGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField_addItemTypeDescriptionActionPerformed
 
     private void jButton_AddItemTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_AddItemTypeActionPerformed
-        add.addItemType(jTextField_addItemTypeName.getText(), jTextField_addItemTypeDescription.getText());
+        try {
+            String output = add.addItemType(jTextField_addItemTypeName.getText(), jTextField_addItemTypeDescription.getText());
+            
+            int index = output.indexOf("ERROR CODE:");
+            String errorCode = "";
+            if (index != -1)
+                errorCode = output.substring(output.indexOf("ERROR CODE:") + 12);
+            switch (errorCode){
+                case "NAME-IN-USE" : createPopUp(new Object[]{"okay"}, "Name In Use", output, JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 0);
+                case "" : createPopUp(new Object[]{"okay"}, "Successful Add", output, JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 0);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(InventoryGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton_AddItemTypeActionPerformed
 
+    private int createPopUp(Object[] options, String title, String message, int optionType, int messageType, int initialVal) {
+        
+        int n = JOptionPane.showOptionDialog(null,
+            message,
+            title,
+            optionType,
+            messageType,
+            null,
+            options,
+            options[initialVal]);
+        
+        return n;
+    }
+    
+    
     private void jButtton_AddItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtton_AddItemActionPerformed
         TableModel table = jTable_AddValues.getModel();
-        // Name, quantity, price, description, Shelf life, color, pfp, location
-        // Adding the item
-        add.addItem(table.getValueAt(0, 1).toString(), 
-                Integer.parseInt(table.getValueAt(1, 1).toString()), 
-                Double.parseDouble(table.getValueAt(2, 1).toString()), 
-                table.getValueAt(3, 1).toString(), 
-                Integer.parseInt(table.getValueAt(4, 1).toString()), 
-                table.getValueAt(5, 1).toString(), 
-                null, 
-                table.getValueAt(7, 1).toString(),
-                table.getValueAt(8, 1).toString());
+        // 2 Places where if the number of rows/data changes, the code will not work
+        try {
+            // Name, quantity, price, description, Shelf life, color, pfp, location
+            // Adding the item
+            String output = add.addItem(table.getValueAt(0, 1).toString(),
+                    Integer.parseInt(table.getValueAt(1, 1).toString()),
+                    Double.parseDouble(table.getValueAt(2, 1).toString()),
+                    table.getValueAt(3, 1).toString(),
+                    Integer.parseInt(table.getValueAt(4, 1).toString()),
+                    table.getValueAt(5, 1).toString(),
+                    null,
+                    table.getValueAt(7, 1).toString(),
+                    table.getValueAt(8, 1).toString());
+            
+            
+            int index = output.indexOf("ERROR CODE:");
+            String errorCode = "";
+            if (index != -1)
+                errorCode = output.substring(output.indexOf("ERROR CODE:") + 11);
+            switch (errorCode){
+                case "NAME-IN-USE" : createPopUp(new Object[]{"okay"}, "Name In Use", output, JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 0);
+                case "ITEM-TYPE-DNE" : int choice = createPopUp(new Object[]{"Yes", "No"}, "Item Type Does Not Exist", output, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, 1);
+                if (choice == 0) {
+                    table.setValueAt("Misc", 8, 1);
+                    jButtton_AddItemActionPerformed(evt);
+                }
+                case "" : createPopUp(new Object[]{"okay"}, "Successful Add", output, JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 0);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(InventoryGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButtton_AddItemActionPerformed
 
     private HashMap<String, ArrayList<String[]>> testData() {
@@ -898,20 +961,28 @@ public class InventoryGUI extends javax.swing.JFrame {
         ArrayList<String[]> dessert = new ArrayList<>();
         dessert.add(new String[]{"chocolate", "3", "6", "yum", "4", "black", "", "counter", "desserts"});
         dessert.add(new String[]{"ice cream", "1", "1", "yum", "4", "white", "", "freezer", "desserts"});
-        data.put("dessert", dessert);
-        dessert.clear();
+        dessert.add(new String[]{"brownie", "1", "1", "yum", "4", "white", "", "freezer", "desserts"});
+        dessert.add(new String[]{"cookie", "1", "1", "yum", "4", "white", "", "freezer", "desserts"});
+        dessert.add(new String[]{"anything else", "1", "1", "yum", "4", "white", "", "freezer", "desserts"});
+        data.put("desserts", dessert);
+        ArrayList<String[]> food = new ArrayList<>();
         data.put("drinks", new ArrayList<>());
-        dessert.add(new String[]{"pizza", "1", "1", "yum", "4", "white", "", "microwave", "food"});
-        data.put("food", dessert);
+        food.add(new String[]{"pizza", "1", "1", "yum", "4", "white", "", "microwave", "food"});
+        data.put("food", food);
         data.put("misc", new ArrayList<>());
         return data;
     }
     
     private void jButton_RefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RefreshActionPerformed
+        try {
+            updateLog();
+        } catch (SQLException ex) {
+            Logger.getLogger(InventoryGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         // Getting data as a Hashmap of key being the item type name as a string
         // and the value being an arraylist of String arrays, each array holding
         // the stats/details about each item in that item type. Github test
-        HashMap<String, ArrayList<String[]>> data = testData();//view.returnData();
+        HashMap<String, ArrayList<String[]>> data = view.returnData();
         
         // The panel should not just be the addPanel but whichever tab you are on.
         JPanel holderPanel = new JPanel();
@@ -944,6 +1015,7 @@ public class InventoryGUI extends javax.swing.JFrame {
             
             addLabel(holderPanel, new Font("Times New Roman", Font.PLAIN, 20), key, 10);
             
+            
             addTable(model, holderPanel, 100);
             
             sectionY++;
@@ -959,16 +1031,60 @@ public class InventoryGUI extends javax.swing.JFrame {
         jPanel_addPanel.update(jPanel_addPanel.getGraphics());
     }//GEN-LAST:event_jButton_RefreshActionPerformed
 
+    private void jButton_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_resetActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton_resetActionPerformed
+
+    private void jButton_testLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_testLogActionPerformed
+        ArrayList<String> log = new ArrayList<>();
+        log.add("TEST");
+        log.add("TEST2");
+        int index = 0;
+        DefaultTableModel model = (DefaultTableModel) (jTable_log.getModel());
+        for (String val : log) {
+            model.addRow(new String[]{val});
+            index++;
+        }
+        jTable_log.updateUI();
+    }//GEN-LAST:event_jButton_testLogActionPerformed
+
+    
+    /////////////////////////////////////////////////////////////////////////////
+    private void updateLog() throws SQLException {
+        ArrayList<String[]> log = view.getDBLog();
+        int index = 0;
+        DefaultTableModel model = (DefaultTableModel) jTable_log.getModel();
+        for (String[] val : log) {
+            model.addRow(new String[]{val[0], val[1]});
+            index++;
+        }
+        jTable_log.updateUI();
+    }
+    
+    /////////////////////////////////////////////////////////////////////////////
     private void addTable(DefaultTableModel model, JPanel panel, int buffer) {
         JTable table = new JTable(model);
         JScrollPane tableScrollPane = new JScrollPane(table);
         
         JTableHeader header = table.getTableHeader();
-        int headerHeight = header.getHeight();
+        int headerHeight = 0;
+        //int headerHeight = header.getHeight();
         System.out.println("height " + headerHeight);
         
-        table.setPreferredSize(new Dimension(tableScrollPane.getWidth(), model.getRowCount() * table.getRowHeight() + headerHeight));
-        tableScrollPane.setPreferredSize(new Dimension(tableScrollPane.getWidth(), model.getRowCount() * table.getRowHeight() + headerHeight));
+        header.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // This method is called when the JTableHeader is resized
+                int headerHeight = header.getHeight();
+                table.setPreferredSize(new Dimension(tableScrollPane.getWidth(), (model.getRowCount()) * table.getRowHeight() + headerHeight + 10));
+                tableScrollPane.setPreferredSize(new Dimension(tableScrollPane.getWidth(), (model.getRowCount()) * table.getRowHeight() + headerHeight + 10));
+     
+                System.out.println("Header Height after resize: " + headerHeight);
+                System.out.println("row height: " + table.getRowHeight());
+            }
+        });
+        
+        System.out.println("after the compnent listeneer");
         
         panel.add(tableScrollPane);
         panel.add(Box.createRigidArea(new Dimension(0, buffer)));
@@ -1022,7 +1138,11 @@ public class InventoryGUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new InventoryGUI().setVisible(true);
+                try {
+                    new InventoryGUI().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -1039,6 +1159,8 @@ public class InventoryGUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton9;
     private javax.swing.JButton jButton_AddItemType;
     private javax.swing.JButton jButton_Refresh;
+    private javax.swing.JButton jButton_reset;
+    private javax.swing.JButton jButton_testLog;
     private javax.swing.JButton jButtton_AddItem;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1048,9 +1170,6 @@ public class InventoryGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
@@ -1060,6 +1179,7 @@ public class InventoryGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -1070,11 +1190,10 @@ public class InventoryGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanel_Debug;
     private javax.swing.JPanel jPanel_add;
     private javax.swing.JPanel jPanel_addPanel;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane10;
-    private javax.swing.JScrollPane jScrollPane11;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
@@ -1084,14 +1203,12 @@ public class InventoryGUI extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable10;
-    private javax.swing.JTable jTable11;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable6;
     private javax.swing.JTable jTable7;
     private javax.swing.JTable jTable8;
-    private javax.swing.JTable jTable9;
     private javax.swing.JTable jTable_AddValues;
+    private javax.swing.JTable jTable_log;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField5;

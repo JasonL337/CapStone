@@ -43,6 +43,7 @@ public class ViewInv extends Inventory {
                 try (Statement statement = conn.createStatement()) {
                     // Executes query that returns a string of all the item type names
                     String[] types = returnItemTypes(statement);
+                    statement.close();
                     for (String type : types) {
                         ArrayList<String[]> itemData = returnItemData(conn, type);
                         data.put(type, itemData);
@@ -50,6 +51,7 @@ public class ViewInv extends Inventory {
                     // Close the result set and statement
                     // You can execute SQL queries here
                 }
+                conn.close();
             }
         } catch (SQLException ex) {
             System.out.println("Failed to connect to the database: " + ex.getMessage());
@@ -114,10 +116,12 @@ public class ViewInv extends Inventory {
         pstmt.setString(1, itemType);
         resultSet = pstmt.executeQuery();
         
+        
         ResultSetMetaData metaData = resultSet.getMetaData();
 
         // Get the number of columns
         int size = metaData.getColumnCount();
+        
         
         while (resultSet.next()) {
             String[] rowData = new String[size];
@@ -132,6 +136,7 @@ public class ViewInv extends Inventory {
         }
         
         resultSet.close();
+        pstmt.close();
         return data;
     }
     

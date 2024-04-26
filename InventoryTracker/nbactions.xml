@@ -15,7 +15,7 @@
                 <exec.appArgs></exec.appArgs>
                 <exec.mainClass>${packageClassName}</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>G:\My Drive\CSIII\NetBeansProjects\InventoryTracker</exec.workingdir>
+                <exec.workingdir>C:\src\CSProjects\CapStone\InventoryTracker</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -34,7 +34,7 @@
                 <exec.mainClass>${packageClassName}</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>G:\My Drive\CSIII\NetBeansProjects\InventoryTracker</exec.workingdir>
+                <exec.workingdir>C:\src\CSProjects\CapStone\InventoryTracker</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -51,7 +51,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>${packageClassName}</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>G:\My Drive\CSIII\NetBeansProjects\InventoryTracker</exec.workingdir>
+                <exec.workingdir>C:\src\CSProjects\CapStone\InventoryTracker</exec.workingdir>
                 <exec.appArgs></exec.appArgs>
             </properties>
         </action>

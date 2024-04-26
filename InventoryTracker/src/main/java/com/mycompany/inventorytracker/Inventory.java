@@ -9,8 +9,16 @@ package com.mycompany.inventorytracker;
 import java.awt.image.BufferedImage;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Date;
 
 public abstract class Inventory {
     
@@ -28,7 +36,7 @@ public abstract class Inventory {
     
     protected String[] getDBInfo() {
         Properties props = new Properties();
-        try (FileReader reader = new FileReader("JDBInfo.env")) {
+        try (FileReader reader = new FileReader("src/main/java/com/mycompany/inventorytracker/gitIgnoreFiles/JDBInfo.env")) {
             props.load(reader);
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,6 +52,25 @@ public abstract class Inventory {
     public void addChanges(String c)
     {
         CHANGES.add(c);
+    }
+    
+    protected void addChangesToDB(String c, Connection conn) throws SQLException {
+        PreparedStatement pstmt = conn.prepareStatement("INSERT INTO log (Date, Entries) VALUES (?, ?)");
+        pstmt.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()));
+        pstmt.setString(2, c);
+        pstmt.executeUpdate();
+    }
+    
+    public ArrayList<String[]> getDBLog() throws SQLException {
+        ArrayList<String[]> loggedData = new ArrayList<>();
+        String[] dbInfo = getDBInfo();
+        Connection conn = DriverManager.getConnection(dbInfo[0], dbInfo[1], dbInfo[2]);
+        Statement statement = conn.createStatement();
+        ResultSet log = statement.executeQuery("SELECT * FROM log");
+        while (log.next()) {
+            loggedData.add(new String[]{log.getTimestamp(1).toString(), log.getString(2)});
+        }
+        return loggedData;
     }
     
     // Tmporary, will be taken out later
@@ -71,6 +98,10 @@ public abstract class Inventory {
         
     }
     
+    public ArrayList<String> getChangesRaw() {
+        return CHANGES;
+    }
+    
     public void addLocalChanges(String c){
         localChanges = c;
     }
@@ -96,79 +127,30 @@ public abstract class Inventory {
         this.output = output;
     }
     
-        // Parent method to print out the output which is updated in the other classes.
-    public void addNewItemToDatabase()
-    {
-        output += "\nsuccessfully added item";
-        System.out.println(output);
-    }
-    
-    // Same as add new item, but with item type
-    public void addNewItemTypeToDatabase()
-    {
-        output += "\nsuccessfully added item type";
-        System.out.println(output);
-    }
-    
-    // Parent functions for removing items or item types.
-    public void RemoveItemFromDatabase()
-    {
-        output += "\nsuccessfully removed item";
-        System.out.println(output);
-    }
-    
-    public void RemoveItemTypeFromDatabase()
-    {
-        output += "\nsuccessfully removed item type";
-        System.out.println(output);
-    }
-    
-    // Methods to get database values
-    
-    protected int getQuantity(String itemName) {
-        return 0;
-    }
-
-    protected String getItemName(String itemName) {
-        return "";
-    }
-    
-    protected double getPrice(String itemName) {
-        return 0;
-    }
-
-    protected double getShelfLife(String itemName) {
-        return 0;
-    }
-
-    protected String getItemDescription(String itemName) {
-        return "";
-    }
-
-    protected String getColor(String itemName) {
-        return "";
-    }
-
-    protected BufferedImage getPicture(String itemName) {
-        return null;
-    }
-
-    protected String getLocation(String itemName) {
-        // SQL call
-        return "";
-    }
-
-    protected double getDaysLeftInStock(String itemName) {
-        // SQL call
-        return 0;
-    }
-    
-    protected String getItemTypeName(String itemTypeName) {
-        return "";
-    }
-    
-    protected String getDescription(String itemTypeName) {
-        return "";
+    // Returns an array of strings that are the data points/cells for a certain row that has a certain value
+    // (name) for a certain column in that row (columnName)
+    protected String[] getRowByName(String name, String tableName, String columnName, Connection conn) throws SQLException {
+        String query = "SELECT * FROM " + tableName + " WHERE " + columnName + " = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        ResultSet resultSet;
+        
+        pstmt.setString(1, name);
+        resultSet = pstmt.executeQuery();
+        
+        int columnCount =  resultSet.getMetaData().getColumnCount();
+        
+        String[] data = new String[columnCount];
+        if (resultSet.next()) 
+        {
+            for (int i = 1; i <= columnCount; i++)
+            {
+                data[i - 1] = resultSet.getString(i);
+            }
+        }
+        else
+            return new String[0];
+        
+        return data;
     }
     
     

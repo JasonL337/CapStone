@@ -23,7 +23,7 @@ public class Test {
         
         Properties props = new Properties();
         System.out.println("Current working directory: " + System.getProperty("user.dir"));
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\src\\CSProjects\\CapStone\\JDBInfo.env"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/java/com/mycompany/inventorytracker/gitIgnoreFiles/JDBInfo.env"))) {
             props.load(reader);
         } catch (IOException e) {
             e.printStackTrace();
