@@ -105,7 +105,9 @@ public class ViewInv extends Inventory {
         }
         return names;
     }
-    
+    /*
+    in java, i have a method called changeItem, where it has 8 different parameters of type String[] "originalName", int[] "quantity", String[] "itemName", double[] "price", int[] "shelfLife", String[] "itemDescription", String[] "color", String[] "picture", String[] "location", int[] "daysLeftInStock", and I want to compare that with a resultSet of a mysql database whose columns match the names of the parameters, and the rows of the resultSet are all the rows that have a value in the given "originalName" array. Each row of the resultSet corresponds to a new index in each array of the parameters given. As it notices the changes, the code adds it to a 
+    */
     private ArrayList<String[]> returnItemData(Connection conn, String itemType) throws SQLException {
         // getting all of the data from the items table by creating a prepared statement
         // and then injecting the itemType to the where clause.
