@@ -16,10 +16,12 @@ com\mycompany\inventorytracker\InventoryGUI$14.class
 com\mycompany\inventorytracker\ChangeInv$changedVals.class
 com\mycompany\inventorytracker\Inventory.class
 com\mycompany\inventorytracker\InventoryGUI.class
+com\mycompany\inventorytracker\LocalChanges.class
+com\mycompany\inventorytracker\BarChartPanel.class
 com\mycompany\inventorytracker\ChangeInv.class
 com\mycompany\inventorytracker\InventoryGUI$10.class
 com\mycompany\inventorytracker\InventoryGUI$3.class
 com\mycompany\inventorytracker\InventoryGUI$12.class
-com\mycompany\inventorytracker\InventoryGUI$15.class
 com\mycompany\inventorytracker\ViewInv.class
+com\mycompany\inventorytracker\Modified.class
 com\mycompany\inventorytracker\InventoryGUI$8.class
